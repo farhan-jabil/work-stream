@@ -36,9 +36,9 @@ const Navbar = () => {
     <div
       className={`${
         isSticky
-          ? "fixed top-0 left-0 right-0 bg-white bg-opacity-30 backdrop-blur-lg shadow-lg text-[#12123E] border-gray-200"
+          ? "fixed top-0 left-0 right-0 bg-white/40 backdrop-blur-md shadow-lg text-[#12123E] border-b border-white/60"
           : "bg-gradient-to-r from-blue-100 via-blue-50 to-green-100 text-[#12123E] border-gray-200"
-      } ${isSticky ? "p-1" : ""} transition-all duration-2000`}
+      } ${isSticky ? "p-1" : ""} transition-all duration-500`}
       style={{ zIndex: 1000 }}
     >
       <Container>
