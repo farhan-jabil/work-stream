@@ -8,6 +8,7 @@ import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 import { FaBars, FaTimes } from "react-icons/fa";
 import logo from "../../assets/logo.png";
+import Container from "./Container";
 
 const navItems = [
   { to: "hero", label: "Home" },
@@ -35,55 +36,68 @@ const Navbar = () => {
     <div
       className={`${
         isSticky
-          ? "fixed top-0 left-0 right-0 bg-white bg-opacity-30 backdrop-blur-lg shadow-lg text-[#12123E] border-gray-200 dark:bg-gray-900"
-          : "bg-gradient-to-r from-blue-100 via-blue-50 to-green-100 text-[#12123E] border-gray-200 dark:bg-gray-900"
+          ? "fixed top-0 left-0 right-0 bg-white bg-opacity-30 backdrop-blur-lg shadow-lg text-[#12123E] border-gray-200"
+          : "bg-gradient-to-r from-blue-100 via-blue-50 to-green-100 text-[#12123E] border-gray-200"
       } ${isSticky ? "p-1" : ""} transition-all duration-2000`}
       style={{ zIndex: 1000 }}
     >
-      <nav className={`max-w-screen-xl flex flex-wrap items-center justify-between mx-auto ${isSticky ? "py-0 md:py-2" : "py-0 md:py-4"}`}>
-        <ScrollLink to="hero" className="flex items-center p-4 lg:p-0 cursor-pointer">
-          <Image src={logo} alt="Work Stream Logo" className="h-[50px] lg:h-[100px] w-[100px] lg:w-[150px] rounded-xl" />
-        </ScrollLink>
-
-        {/* Desktop nav */}
-        <ul className="font-medium hidden md:flex p-0 space-x-8">
-          {navItems.map((item) => (
-            <li key={item.to}>
-              <ScrollLink
-                to={item.to}
-                smooth={true}
-                duration={500}
-                className="nav-link cursor-pointer hover:text-[#9191c4] focus:outline-none transition-colors duration-500 ease-in-out"
-                activeClass="active"
-              >
-                {item.label}
-              </ScrollLink>
-            </li>
-          ))}
-        </ul>
-
-        <div className="hidden md:flex">
-          <Link href="/signInUp">
-            <button
-              type="button"
-              className="relative overflow-hidden text-white bg-gradient-to-r from-green-500 to-blue-500 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-2 transition-transform duration-500 ease-in-out group"
-            >
-              <span className="absolute inset-0 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg transform scale-0 group-hover:scale-100 transition-transform duration-500 ease-in-out"></span>
-              <span className="relative z-10 flex items-center justify-center">Login</span>
-            </button>
-          </Link>
-        </div>
-
-        {/* Hamburger — opens drawer */}
-        <button
-          onClick={() => setIsDrawerOpen(true)}
-          type="button"
-          className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden bg-transparent hover:bg-transparent focus:ring-transparent focus:outline-none"
+      <Container>
+        <nav
+          className={`flex flex-wrap items-center justify-between mx-auto ${isSticky ? "py-0 md:py-2" : "py-0 md:py-4"}`}
         >
-          <span className="sr-only">Open mobile menu</span>
-          <FaBars className="w-5 h-5" />
-        </button>
-      </nav>
+          <ScrollLink
+            to="hero"
+            className="flex items-center p-4 lg:p-0 cursor-pointer"
+          >
+            <Image
+              src={logo}
+              alt="Work Stream Logo"
+              className="h-[50px] lg:h-[100px] w-[100px] lg:w-[150px] rounded-xl"
+            />
+          </ScrollLink>
+
+          {/* Desktop nav */}
+          <ul className="font-medium hidden md:flex p-0 space-x-8">
+            {navItems.map((item) => (
+              <li key={item.to}>
+                <ScrollLink
+                  to={item.to}
+                  smooth={true}
+                  duration={500}
+                  className="nav-link cursor-pointer hover:text-[#9191c4] focus:outline-none transition-colors duration-500 ease-in-out"
+                  activeClass="active"
+                >
+                  {item.label}
+                </ScrollLink>
+              </li>
+            ))}
+          </ul>
+
+          <div className="hidden md:flex">
+            <Link href="/signInUp">
+              <button
+                type="button"
+                className="relative overflow-hidden text-white bg-gradient-to-r from-green-500 to-blue-500 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-2 transition-transform duration-500 ease-in-out group"
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg transform scale-0 group-hover:scale-100 transition-transform duration-500 ease-in-out"></span>
+                <span className="relative z-10 flex items-center justify-center">
+                  Login
+                </span>
+              </button>
+            </Link>
+          </div>
+
+          {/* Hamburger — opens drawer */}
+          <button
+            onClick={() => setIsDrawerOpen(true)}
+            type="button"
+            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden bg-transparent hover:bg-transparent focus:ring-transparent focus:outline-none"
+          >
+            <span className="sr-only">Open mobile menu</span>
+            <FaBars className="w-5 h-5" />
+          </button>
+        </nav>
+      </Container>
 
       {/* Mobile drawer */}
       <Drawer
@@ -123,7 +137,9 @@ const Navbar = () => {
                 type="button"
                 className="w-full relative overflow-hidden text-white bg-gradient-to-r from-green-500 to-blue-500 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 transition-transform duration-500 ease-in-out group"
               >
-                <span className="relative z-10 flex items-center justify-center">Login</span>
+                <span className="relative z-10 flex items-center justify-center">
+                  Login
+                </span>
               </button>
             </Link>
           </div>
