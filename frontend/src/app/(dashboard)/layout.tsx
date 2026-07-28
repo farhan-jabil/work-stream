@@ -29,7 +29,7 @@ export default function DashboardLayout({
   useEffect(() => {
     const token = localStorage.getItem("auth-token");
     if (!token) {
-      router.push("/signInUp/login");
+      router.push("/auth/login");
       return;
     }
     setHasToken(true);
@@ -45,7 +45,7 @@ export default function DashboardLayout({
 
   const handleLogout = () => {
     localStorage.removeItem("auth-token");
-    router.push("/signInUp/login");
+    router.push("/auth/login");
   };
 
   const navLinkClass = (href: string) =>

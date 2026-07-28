@@ -1,11 +1,8 @@
-import React from 'react'
+import EmployeeManagement from "@/components/Dashboard/EmployeeManagement";
+import React from "react";
 
 const page = () => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+  return <EmployeeManagement />;
+};
 
-export default page
+export default page;

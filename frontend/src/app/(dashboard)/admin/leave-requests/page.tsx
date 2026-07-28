@@ -1,11 +1,8 @@
-import React from 'react'
+import LeaveRequests from "@/components/Dashboard/LeaveRequest";
+import React from "react";
 
 const page = () => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+  return <LeaveRequests />;
+};
 
-export default page
+export default page;

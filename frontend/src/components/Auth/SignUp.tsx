@@ -88,7 +88,7 @@ const Signup = () => {
       }).unwrap();
 
       toast.success("Account created successfully");
-      router.push("/signInUp/login");
+      router.push("/auth/login");
     } catch (err: any) {
       const message = err?.data?.message || "Signup failed. Please try again.";
       toast.error(message);
@@ -220,7 +220,7 @@ const Signup = () => {
       <p className="text-center text-sm text-gray-500 mt-5">
         Already have an account?{" "}
         <Link
-          href="/signInUp/login"
+          href="/auth/login"
           className="text-blue-500 font-semibold hover:underline"
         >
           Login

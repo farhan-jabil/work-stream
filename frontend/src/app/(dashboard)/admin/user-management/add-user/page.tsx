@@ -1,11 +1,8 @@
-import React from 'react'
+import EmployeeForm from "@/components/Dashboard/EmployeeForm";
+import React from "react";
 
 const page = () => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+  return <EmployeeForm />;
+};
 
-export default page
+export default page;
