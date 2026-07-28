@@ -39,7 +39,7 @@ export default function DashboardLayout({
     skip: !hasToken,
   });
 
-  const userName = data?.user?.name;
+  const userName = (data as any)?.user?.name || (data as any)?.name;
 
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 
@@ -53,129 +53,123 @@ export default function DashboardLayout({
       pathname.startsWith(href) ? "bg-blue-700" : "hover:bg-blue-800"
     } transition`;
 
-  // Avoid flashing dashboard content before the redirect effect runs
   if (!hasToken) return null;
 
   return (
-    <>
-      <div className="flex bg-gray-100">
-        <div className="text-white">
-          <div
-            className={`${
-              isOpen ? "w-32 lg:w-64" : "w-20"
-            } flex items-center justify-center space-x-3 bg-blue-700 h-full lg:h-16 py-2 pr-4`}
+    // Single outer flex row: sidebar | (navbar + content) stacked in a column
+    <div className="flex h-screen overflow-hidden bg-gray-100">
+      {/* Sidebar */}
+      <aside
+        className={`${
+          isOpen ? "w-32 lg:w-64" : "w-20"
+        } flex-shrink-0 bg-blue-900 text-white flex flex-col transition-all duration-200`}
+      >
+        {/* Logo / toggle row — same sidebar column, sits above nav links */}
+        <div className="flex items-center justify-between bg-blue-700 h-16 px-4">
+          <Link href="/" className="flex-shrink-0">
+            <Image
+              src={logo}
+              alt="Work Stream Logo"
+              className="h-[30px] w-[30px] md:h-[40px] md:w-[40px] rounded-xl"
+            />
+          </Link>
+          <button
+            onClick={toggleSidebar}
+            className="text-xl focus:outline-none"
           >
-            <Link href="/">
-              <Image
-                src={logo}
-                alt="Work Stream Logo"
-                className="h-[20px] md:h-[50px] 3xl:h-[80px] w-[30px] md:w-[70px] 3xl:w-[100px] rounded-xl"
-              />
-            </Link>
-            <button
-              onClick={toggleSidebar}
-              className="text-xl focus:outline-none"
-            >
-              <FaBars />
-            </button>
-          </div>
+            <FaBars />
+          </button>
         </div>
 
-        <div className="flex-1 flex flex-col">
-          <nav className="flex flex-col lg:flex-row items-center justify-between py-2 lg:py-4 px-4 lg:px-10 bg-blue-900 text-white shadow">
-            <h1 className="text-lg lg:text-2xl font-semibold">
-              {isAdmin ? "Admin" : "Employee"} Dashboard
-            </h1>
-            <div className="flex items-center space-x-5">
-              Hi,
-              <div className="flex items-center ml-2 space-x-4 hover:text-gray-200 transition">
-                <span className="font-semibold">
-                  {isLoading ? "Loading..." : userName || "User"}
-                </span>
-              </div>
-              <button
-                className="flex items-center hover:text-red-300 transition"
-                onClick={handleLogout}
+        {/* Nav links — flex-1 so it fills remaining sidebar height, scrolls independently if long */}
+        <nav className="flex-1 overflow-y-auto py-6">
+          <ul className="space-y-6 px-0 lg:px-4">
+            <li>
+              <Link
+                href={isAdmin ? "/admin/dashboard" : "/employee/dashboard"}
+                className={navLinkClass(
+                  isAdmin ? "/admin/dashboard" : "/employee/dashboard",
+                )}
               >
-                <FaSignOutAlt className="text-lg mr-2" />
-              </button>
-            </div>
-          </nav>
-        </div>
-      </div>
-
-      <div className="flex h-screen">
-        <div className="text-white">
-          <nav
-            className={`${
-              isOpen ? "block w-32 lg:w-64" : "hidden lg:block w-20"
-            } bg-blue-900 h-full py-6`}
-          >
-            <ul className="space-y-6 px-0 lg:px-4">
-              <li>
-                <Link
-                  href={isAdmin ? "/admin/dashboard" : "/employee/dashboard"}
-                  className={navLinkClass(
-                    isAdmin ? "/admin/dashboard" : "/employee/dashboard",
-                  )}
-                >
-                  <FaTachometerAlt className="text-lg" />
-                  <span
-                    className={`ml-2 lg:ml-4 ${isOpen ? "block" : "hidden"}`}
-                  >
-                    Dashboard
-                  </span>
-                </Link>
-              </li>
-              {isAdmin ? (
-                <>
-                  <li>
-                    <Link
-                      href="/admin/leave-requests"
-                      className={navLinkClass("/admin/leave-requests")}
-                    >
-                      <FaClipboard className="text-lg" />
-                      <span
-                        className={`ml-2 lg:ml-4 ${isOpen ? "block" : "hidden"}`}
-                      >
-                        Leave Requests
-                      </span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/admin/user-management"
-                      className={navLinkClass("/admin/user-management")}
-                    >
-                      <FaUsers className="text-lg" />
-                      <span
-                        className={`ml-2 lg:ml-4 ${isOpen ? "block" : "hidden"}`}
-                      >
-                        Manage Employees
-                      </span>
-                    </Link>
-                  </li>
-                </>
-              ) : (
+                <FaTachometerAlt className="text-lg flex-shrink-0" />
+                <span className={`ml-2 lg:ml-4 ${isOpen ? "block" : "hidden"}`}>
+                  Dashboard
+                </span>
+              </Link>
+            </li>
+            {isAdmin ? (
+              <>
                 <li>
                   <Link
-                    href="/employee/request-leave"
-                    className={navLinkClass("/employee/request-leave")}
+                    href="/admin/leave-requests"
+                    className={navLinkClass("/admin/leave-requests")}
                   >
-                    <FaClipboard className="text-lg" />
+                    <FaClipboard className="text-lg flex-shrink-0" />
                     <span
                       className={`ml-2 lg:ml-4 ${isOpen ? "block" : "hidden"}`}
                     >
-                      Request Leave
+                      Leave Requests
                     </span>
                   </Link>
                 </li>
-              )}
-            </ul>
-          </nav>
-        </div>
-        <div className="p-5 lg:p-10 w-screen overflow-y-auto">{children}</div>
+                <li>
+                  <Link
+                    href="/admin/user-management"
+                    className={navLinkClass("/admin/user-management")}
+                  >
+                    <FaUsers className="text-lg flex-shrink-0" />
+                    <span
+                      className={`ml-2 lg:ml-4 ${isOpen ? "block" : "hidden"}`}
+                    >
+                      Manage Employees
+                    </span>
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <li>
+                <Link
+                  href="/employee/request-leave"
+                  className={navLinkClass("/employee/request-leave")}
+                >
+                  <FaClipboard className="text-lg flex-shrink-0" />
+                  <span
+                    className={`ml-2 lg:ml-4 ${isOpen ? "block" : "hidden"}`}
+                  >
+                    Request Leave
+                  </span>
+                </Link>
+              </li>
+            )}
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Right column: top navbar + scrollable page content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="flex-shrink-0 flex items-center justify-between h-16 px-4 lg:px-10 bg-blue-900 text-white shadow">
+          <h1 className="text-lg lg:text-2xl font-semibold">
+            {isAdmin ? "Admin" : "Employee"} Dashboard
+          </h1>
+          <div className="flex items-center space-x-5">
+            <span>
+              Hi,{" "}
+              <span className="font-semibold">
+                {isLoading ? "Loading..." : userName || "User"}
+              </span>
+            </span>
+            <button
+              className="flex items-center hover:text-red-300 transition"
+              onClick={handleLogout}
+            >
+              <FaSignOutAlt className="text-lg mr-2" />
+            </button>
+          </div>
+        </header>
+
+        {/* Only this area scrolls */}
+        <main className="flex-1 overflow-y-auto p-5 lg:p-10">{children}</main>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,6 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import {
+  useDeleteLeaveMutation,
+  useGetAllLeavesQuery,
+} from "@/redux/features/leave/leaveApi";
+import React from "react";
 
 const leaveTypeMap: Record<string, string> = {
   sick: "Sick Leave",
@@ -9,15 +13,6 @@ const leaveTypeMap: Record<string, string> = {
   maternity: "Maternity Leave",
   paternity: "Paternity Leave",
 };
-
-interface Leave {
-  _id: string;
-  leaveType: string;
-  startDate: string;
-  endDate: string;
-  reason: string;
-  status: "pending" | "approved" | "rejected";
-}
 
 const formatDate = (dateString: string) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -28,75 +23,41 @@ const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
+const capitalizeStatus = (status: string) =>
+  status.charAt(0).toUpperCase() + status.slice(1);
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "pending":
+      return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white";
+    case "approved":
+      return "bg-gradient-to-r from-green-400 to-green-600 text-white";
+    case "rejected":
+      return "bg-gradient-to-r from-red-400 to-red-600 text-white";
+    default:
+      return "bg-gradient-to-r from-gray-400 to-gray-600 text-white";
+  }
+};
+
 const EmployeeDashboard = () => {
-  const [leaves, setLeaves] = useState<Leave[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: leaves = [], isLoading, isError } = useGetAllLeavesQuery();
 
-  useEffect(() => {
-    const token = localStorage.getItem("auth-token");
+  const [deleteLeave] = useDeleteLeaveMutation();
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/request-leave/get-all`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "auth-token": token ?? "",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setLeaves(data.requests);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching leaves:", error);
-        setError("Failed to load leave requests");
-        setLoading(false);
-      });
-  }, []);
-
-  const handleDelete = (id: string) => {
-    const token = localStorage.getItem("auth-token");
-
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/request-leave/delete/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "auth-token": token ?? "",
-      },
-    })
-      .then((response) => response.json())
-      .then(() => {
-        setLeaves(leaves.filter((leave) => leave._id !== id));
-      })
-      .catch((error) => {
-        console.error("Error deleting leave:", error);
-      });
-  };
-
-  const capitalizeStatus = (status: string) => {
-    return status.charAt(0).toUpperCase() + status.slice(1);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white";
-      case "approved":
-        return "bg-gradient-to-r from-green-400 to-green-600 text-white";
-      case "rejected":
-        return "bg-gradient-to-r from-red-400 to-red-600 text-white";
-      default:
-        return "bg-gradient-to-r from-gray-400 to-gray-600 text-white";
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteLeave(id).unwrap();
+    } catch (error) {
+      console.error("Error deleting leave:", error);
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
+  if (isError) {
+    return <div className="text-red-500">Failed to load leave requests</div>;
   }
 
   return (
@@ -158,7 +119,7 @@ const EmployeeDashboard = () => {
                     <td className="p-2">
                       <span
                         className={`inline-block py-1 px-4 rounded-full text-sm font-semibold ${getStatusColor(
-                          leave.status
+                          leave.status,
                         )}`}
                         aria-label={leave.status}
                       >

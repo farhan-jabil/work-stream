@@ -1,78 +1,50 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { toast } from "sonner";
 import { FaCheck, FaTimes } from "react-icons/fa";
+import {
+  useGetAllLeavesQuery,
+  useUpdateLeaveStatusMutation,
+} from "@/redux/features/leave/leaveApi";
 
-interface LeaveRequest {
-  _id: string;
-  employeeName: string;
-  leaveType: "sick" | "casual" | "vacation" | "maternity" | "paternity" | string;
-  startDate: string;
-  endDate: string;
-  status: "pending" | "approved" | "rejected";
-}
+const leaveTypeMap: Record<string, string> = {
+  sick: "Sick Leave",
+  casual: "Casual Leave",
+  vacation: "Vacation Leave",
+  maternity: "Maternity Leave",
+  paternity: "Paternity Leave",
+};
 
 const LeaveRequests = () => {
-  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { data: allRequests = [], isLoading } = useGetAllLeavesQuery();
+  const [updateLeaveStatus] = useUpdateLeaveStatusMutation();
 
-  useEffect(() => {
-    const token = localStorage.getItem("auth-token");
+  const leaveRequests = allRequests.filter(
+    (request) => request.status === "pending",
+  );
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/request-leave/get-all`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "auth-token": token ?? "",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Fetched leave requests:", data);
-        const pendingRequests = data.requests.filter(
-          (request: LeaveRequest) => request.status === "pending"
-        );
-        setLeaveRequests(pendingRequests);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching leave requests:", error);
-        setLoading(false);
-      });
-  }, []);
-
-  const updateLeaveStatus = (id: string, status: "approved" | "rejected") => {
-    const token = localStorage.getItem("auth-token");
-
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/request-leave/update-status/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "auth-token": token ?? "",
-      },
-      body: JSON.stringify({ status }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(`Leave ${status.toLowerCase()}:`, data);
-        setLeaveRequests((prevRequests) =>
-          prevRequests.filter((request) => request._id !== id)
-        );
-      })
-      .catch((error) => {
-        console.error(`Error ${status.toLowerCase()} leave:`, error);
-      });
+  const handleApprove = async (id: string, employeeName: string) => {
+    try {
+      await updateLeaveStatus({ id, status: "approved" }).unwrap();
+      toast.success(`Leave request approved for ${employeeName}`);
+    } catch (error) {
+      console.error("Error approving leave:", error);
+      toast.error("Failed to approve leave request");
+    }
   };
 
-  const handleApprove = (id: string) => {
-    updateLeaveStatus(id, "approved");
+  const handleReject = async (id: string, employeeName: string) => {
+    try {
+      await updateLeaveStatus({ id, status: "rejected" }).unwrap();
+      toast.success(`Leave request rejected for ${employeeName}`);
+    } catch (error) {
+      console.error("Error rejecting leave:", error);
+      toast.error("Failed to reject leave request");
+    }
   };
 
-  const handleReject = (id: string) => {
-    updateLeaveStatus(id, "rejected");
-  };
-
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
@@ -83,11 +55,21 @@ const LeaveRequests = () => {
         <table className="w-full text-sm text-left text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
-              <th scope="col" className="px-6 py-3">Employee Name</th>
-              <th scope="col" className="px-6 py-3">Leave Type</th>
-              <th scope="col" className="px-6 py-3">Start Date</th>
-              <th scope="col" className="px-6 py-3">End Date</th>
-              <th scope="col" className="px-6 py-3">Actions</th>
+              <th scope="col" className="px-6 py-3">
+                Employee Name
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Leave Type
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Start Date
+              </th>
+              <th scope="col" className="px-6 py-3">
+                End Date
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -98,17 +80,7 @@ const LeaveRequests = () => {
                     {request.employeeName}
                   </td>
                   <td className="px-6 py-4">
-                    {request.leaveType === "sick"
-                      ? "Sick Leave"
-                      : request.leaveType === "casual"
-                      ? "Casual Leave"
-                      : request.leaveType === "vacation"
-                      ? "Vacation Leave"
-                      : request.leaveType === "maternity"
-                      ? "Maternity Leave"
-                      : request.leaveType === "paternity"
-                      ? "Paternity Leave"
-                      : "Other"}
+                    {leaveTypeMap[request.leaveType] ?? "Other"}
                   </td>
                   <td className="px-6 py-4">
                     {new Date(request.startDate).toLocaleDateString()}
@@ -121,14 +93,18 @@ const LeaveRequests = () => {
                       <button
                         type="button"
                         className="text-green-500 hover:text-green-700"
-                        onClick={() => handleApprove(request._id)}
+                        onClick={() =>
+                          handleApprove(request._id, request.employeeName)
+                        }
                       >
                         <FaCheck className="mr-1 text-xl" />
                       </button>
                       <button
                         type="button"
                         className="text-red-500 hover:text-red-700"
-                        onClick={() => handleReject(request._id)}
+                        onClick={() =>
+                          handleReject(request._id, request.employeeName)
+                        }
                       >
                         <FaTimes className="mr-1 text-xl" />
                       </button>

@@ -2,26 +2,28 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  useAddLeaveMutation,
+  RequestLeaveData,
+} from "@/redux/features/leave/leaveApi";
 
-interface RequestLeaveFormData {
-  leaveType: string;
-  startDate: string;
-  endDate: string;
-  reason: string;
-}
+const initialFormData: RequestLeaveData = {
+  leaveType: "",
+  startDate: "",
+  endDate: "",
+  reason: "",
+};
 
 const RequestLeave = () => {
-  const [formData, setFormData] = useState<RequestLeaveFormData>({
-    leaveType: "",
-    startDate: "",
-    endDate: "",
-    reason: "",
-  });
-
+  const [formData, setFormData] = useState<RequestLeaveData>(initialFormData);
   const router = useRouter();
 
+  const [addLeave, { isLoading }] = useAddLeaveMutation();
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     setFormData({
       ...formData,
@@ -29,27 +31,16 @@ const RequestLeave = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("auth-token");
-
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/request-leave/add`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "auth-token": token ?? "",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => response.json())
-      .then(() => {
-        alert("Leave request submitted successfully!");
-        router.push("/employee/dashboard");
-      })
-      .catch((error) => {
-        console.error("Error submitting leave request:", error);
-      });
+    try {
+      await addLeave(formData).unwrap();
+      alert("Leave request submitted successfully!");
+      router.push("/employee/dashboard");
+    } catch (error) {
+      console.error("Error submitting leave request:", error);
+    }
   };
 
   return (
@@ -138,9 +129,10 @@ const RequestLeave = () => {
         <div className="flex justify-center">
           <button
             type="submit"
-            className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+            disabled={isLoading}
+            className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Submit Request
+            {isLoading ? "Submitting..." : "Submit Request"}
           </button>
         </div>
       </form>

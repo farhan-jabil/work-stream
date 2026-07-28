@@ -1,4 +1,4 @@
-import { baseApi } from "@/redux/services/baseApi";
+import { baseApi } from "@/redux/api/baseApi";
 
 export interface User {
   id: string;
@@ -7,6 +7,7 @@ export interface User {
   email: string;
   phoneNumber: string;
   role: "admin" | "employee";
+  employeeCount?: number;
 }
 
 export interface AuthResponse {
@@ -28,7 +29,7 @@ export interface SignupRequest {
   password: string;
 }
 
-export interface MeResponse {
+interface GetMeResponse {
   user: User;
 }
 
@@ -37,8 +38,9 @@ export interface MeResponse {
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // GET current logged-in user
-    getMe: builder.query<MeResponse, void>({
+    getMe: builder.query<User, void>({
       query: () => "/user/me",
+      transformResponse: (response: GetMeResponse) => response.user,
       providesTags: ["User"],
     }),
 
@@ -71,7 +73,6 @@ export const authApi = baseApi.injectEndpoints({
       invalidatesTags: ["User"],
     }),
   }),
-  overrideExisting: false,
 });
 
 export const {

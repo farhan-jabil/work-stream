@@ -1,72 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SquarePen, Trash2 } from "lucide-react";
-
-interface Employee {
-  _id: string;
-  name: string;
-  userName: string;
-  email: string;
-  phone: string;
-}
+import {
+  useGetAllEmployeesQuery,
+  useDeleteEmployeeMutation,
+} from "@/redux/features/employee/employeeApi";
 
 const EmployeeManagement = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      const token = localStorage.getItem("auth-token");
-
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/admin/employee-manage/get-all`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "auth-token": token ?? "",
-            },
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch employees");
-        }
-
-        const data = await response.json();
-        setEmployees(data.employees);
-        console.log("Employees set:", data);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
-    };
-
-    fetchEmployees();
-  }, []);
+  const { data: employees = [] } = useGetAllEmployeesQuery();
+  const [deleteEmployee] = useDeleteEmployeeMutation();
 
   const handleDelete = async (id: string) => {
-    const token = localStorage.getItem("auth-token");
-
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/employee-manage/delete/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            "auth-token": token ?? "",
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete employee");
-      }
-
-      setEmployees(employees.filter((employee) => employee._id !== id));
+      await deleteEmployee(id).unwrap();
     } catch (error) {
       console.error("Error deleting employee:", error);
     }
@@ -126,7 +77,7 @@ const EmployeeManagement = () => {
                       </Link>
                       <button
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded inline-flex items-center cursor-pointer"
-                        onClick={() => handleDelete(employee._id)}
+                        onClick={() => handleDelete(employee._id!)}
                       >
                         <Trash2 />
                       </button>

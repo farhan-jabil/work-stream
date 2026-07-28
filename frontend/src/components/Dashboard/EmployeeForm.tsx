@@ -2,81 +2,74 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
+import {
+  useGetEmployeeQuery,
+  useAddEmployeeMutation,
+  useEditEmployeeMutation,
+  Employee,
+} from "@/redux/features/employee/employeeApi";
 
-interface EmployeeFormData {
-  name: string;
-  userName: string;
-  email: string;
-  phone: string;
-  password: string;
-  designation: string;
-}
+const initialFormData: Employee = {
+  name: "",
+  userName: "",
+  email: "",
+  phone: "",
+  password: "",
+  designation: "",
+};
 
 const EmployeeForm = () => {
   const params = useParams<{ id?: string }>();
   const id = params?.id;
   const router = useRouter();
 
-  const [formData, setFormData] = useState<EmployeeFormData>({
-    name: "",
-    userName: "",
-    email: "",
-    phone: "",
-    password: "",
-    designation: "",
+  const [formData, setFormData] = useState<Employee>(initialFormData);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const { data: employee } = useGetEmployeeQuery(id as string, {
+    skip: !id,
   });
 
+  const [addEmployee] = useAddEmployeeMutation();
+  const [editEmployee] = useEditEmployeeMutation();
+
   useEffect(() => {
-    if (id) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/employee-manage/get/${id}`, {
-        headers: {
-          "auth-token": localStorage.getItem("auth-token") ?? "",
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          setFormData(data.employee);
-          setFormData((prev) => ({ ...prev, password: "" }));
-        })
-        .catch((error) => console.error("Error fetching employee:", error));
+    if (employee) {
+      setFormData({ ...employee, password: "" });
     }
-  }, [id]);
+  }, [employee]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const url = id
-      ? `${process.env.NEXT_PUBLIC_API_URL}/admin/employee-manage/edit/${id}`
-      : `${process.env.NEXT_PUBLIC_API_URL}/admin/employee-manage/add`;
-    const method = id ? "PUT" : "POST";
-
-    fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        "auth-token": localStorage.getItem("auth-token") ?? "",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Employee data:", data);
-        router.push("/admin/user-management");
-      })
-      .catch((error) => console.error(`Error ${id ? "updating" : "adding"} employee:`, error));
+    try {
+      if (id) {
+        await editEmployee({ id, data: formData }).unwrap();
+        toast.success(`${formData.name} updated successfully`);
+      } else {
+        await addEmployee(formData).unwrap();
+        toast.success(`${formData.name} added successfully`);
+      }
+      router.push("/admin/user-management");
+    } catch (error) {
+      console.error(`Error ${id ? "updating" : "adding"} employee:`, error);
+      toast.error(`Failed to ${id ? "update" : "add"} employee`);
+    }
   };
 
   return (
     <div className="container">
-      <div className="relative overflow-x-auto w-[80%] mx-auto mt-10">
+      <div className="relative overflow-x-auto mx-auto ">
         <div className="text-2xl text-center font-semibold mb-5">
           {id ? "Edit Employee" : "Add Employee"}
         </div>
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+        <form onSubmit={handleSubmit} className="mx-auto">
           <div className="relative z-0 w-full mb-5 group">
             <input
               type="text"
@@ -170,11 +163,11 @@ const EmployeeForm = () => {
           {!id && (
             <div className="relative z-0 w-full mb-5 group">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                className="block py-2.5 pr-8 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                 placeholder=" "
                 required
               />
@@ -184,6 +177,19 @@ const EmployeeForm = () => {
               >
                 Password
               </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-0 top-2.5 text-gray-500 hover:text-gray-700"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
           )}
 
