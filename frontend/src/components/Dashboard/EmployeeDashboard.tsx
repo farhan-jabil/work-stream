@@ -136,7 +136,7 @@ const EmployeeDashboard = () => {
                           Cancel Leave
                         </button>
                       ) : (
-                        <span className="text-gray-500">Can't cancel</span>
+                        <span className="text-gray-500">Can&apos;t cancel</span>
                       )}
                     </td>
                   </tr>
