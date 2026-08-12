@@ -8,8 +8,8 @@ import {
   useGetEmployeeQuery,
   useAddEmployeeMutation,
   useEditEmployeeMutation,
-  Employee,
 } from "@/redux/features/employee/employeeApi";
+import { Employee } from "@/types/employee.types";
 
 const initialFormData: Employee = {
   name: "",

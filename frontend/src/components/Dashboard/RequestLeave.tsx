@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   useAddLeaveMutation,
-  RequestLeaveData,
 } from "@/redux/features/leave/leaveApi";
+import { RequestLeaveData } from "@/types/leave.types";
 
 const initialFormData: RequestLeaveData = {
   leaveType: "",
