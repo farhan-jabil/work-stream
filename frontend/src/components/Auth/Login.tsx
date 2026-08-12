@@ -6,11 +6,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "sonner";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { getRoleFromToken } from "@/utils/auth";
-
-interface FormErrors {
-  userName?: string;
-  password?: string;
-}
+import { LoginFormErrors } from "@/types/auth.types";
 
 const Login = () => {
   const router = useRouter();
@@ -19,10 +15,10 @@ const Login = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<LoginFormErrors>({});
 
   const validate = (): boolean => {
-    const newErrors: FormErrors = {};
+    const newErrors: LoginFormErrors = {};
 
     if (!userName.trim()) {
       newErrors.userName = "User name is required";

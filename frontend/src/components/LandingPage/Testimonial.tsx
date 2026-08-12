@@ -6,6 +6,7 @@ import type { Settings } from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Container from "../shared/Container";
+import { Testimonial as TestimonialItem } from "@/types/landing.types";
 
 const Slider = dynamic(() => import("react-slick"), {
   ssr: false,
@@ -36,14 +37,8 @@ const settings: Settings = {
   ],
 };
 
-interface Testimonial {
-  name: string;
-  title: string;
-  feedback: string;
-  avatar: string;
-}
 
-const testimonialsData: Testimonial[] = [
+const testimonialsData: TestimonialItem[] = [
   {
     name: "John Doe",
     title: "CEO, Example Inc.",

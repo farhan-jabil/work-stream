@@ -1,33 +1,5 @@
 import { baseApi } from "@/redux/api/baseApi";
-
-export interface User {
-  id: string;
-  name: string;
-  userName: string;
-  email: string;
-  phoneNumber: string;
-  role: "admin" | "employee";
-  employeeCount?: number;
-}
-
-export interface AuthResponse {
-  token: string;
-  user: User;
-  message?: string;
-}
-
-export interface LoginRequest {
-  userName: string;
-  password: string;
-}
-
-export interface SignupRequest {
-  name: string;
-  userName: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-}
+import { AuthResponse, LoginRequest, SignupRequest, User } from "@/types/auth.types";
 
 interface GetMeResponse {
   user: User;
@@ -37,7 +9,6 @@ interface GetMeResponse {
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // GET current logged-in user
     getMe: builder.query<User, void>({
       query: () => "/user/me",
       transformResponse: (response: GetMeResponse) => response.user,

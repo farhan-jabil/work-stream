@@ -1,13 +1,4 @@
-import { ReactNode, ElementType } from "react";
-
-type ContainerSize = "sm" | "md" | "lg" | "xl" | "full";
-
-interface ContainerProps {
-  children: ReactNode;
-  size?: ContainerSize;
-  className?: string;
-  as?: ElementType;
-}
+import { ContainerProps, ContainerSize } from "@/types/ui.types";
 
 const sizeMap: Record<ContainerSize, string> = {
   sm: "max-w-2xl",   // ~672px  — FAQ-style narrow content

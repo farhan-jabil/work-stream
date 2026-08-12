@@ -1,12 +1,7 @@
 "use client";
 
+import { CounterProps } from "@/types/ui.types";
 import CountUp from "react-countup";
-
-interface CounterProps {
-  number: number;
-  title?: string;
-  isCounting: boolean;
-}
 
 export default function Counter({ number, title, isCounting }: CounterProps) {
   return (

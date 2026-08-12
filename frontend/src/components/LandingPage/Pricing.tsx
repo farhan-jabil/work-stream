@@ -1,15 +1,6 @@
 import { MdCheckCircle } from "react-icons/md";
 import Container from "../shared/Container";
-
-interface PricingPlan {
-  name: string;
-  price: number;
-  tagline: string;
-  features: string[];
-  gradient: string;
-  textAccent: string;
-  buttonText: string;
-}
+import { PricingPlan } from "@/types/landing.types";
 
 const plans: PricingPlan[] = [
   {

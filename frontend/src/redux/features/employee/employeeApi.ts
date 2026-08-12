@@ -1,14 +1,5 @@
 import { baseApi } from "@/redux/api/baseApi";
-
-export interface Employee {
-  _id?: string;
-  name: string;
-  userName: string;
-  email: string;
-  phone: string;
-  password: string;
-  designation: string;
-}
+import { Employee } from "@/types/employee.types";
 
 interface GetEmployeeResponse {
   employee: Employee;

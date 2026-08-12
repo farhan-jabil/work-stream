@@ -1,7 +1,5 @@
-interface Feature {
-  title: string;
-  description: string;
-}
+import { Feature } from "@/types/landing.types";
+
 
 const features: Feature[] = [
   {

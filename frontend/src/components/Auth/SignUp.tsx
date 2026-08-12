@@ -5,15 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useSignupMutation } from "@/redux/features/auth/authApi";
-
-interface FormErrors {
-  name?: string;
-  userName?: string;
-  email?: string;
-  phoneNumber?: string;
-  password?: string;
-  confirmPassword?: string;
-}
+import { SignupFormErrors } from "@/types/auth.types";
 
 const Signup = () => {
   const router = useRouter();
@@ -25,10 +17,10 @@ const Signup = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<SignupFormErrors>({});
 
   const validate = (): boolean => {
-    const newErrors: FormErrors = {};
+    const newErrors: SignupFormErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\+?[0-9]{7,15}$/;
 

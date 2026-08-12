@@ -9,18 +9,9 @@ import {
 } from "react-icons/fa";
 import Container from "../shared/Container";
 import Counter from "../../lib/counter/Counter";
+import { Achievement, ValueCard } from "@/types/landing.types";
 
-interface ValueCard {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-}
 
-interface Achievement {
-  number: number;
-  label: string;
-  bgColor: string;
-}
 
 const values: ValueCard[] = [
   {
