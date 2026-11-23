@@ -6,6 +6,7 @@ import {
   useAddLeaveMutation,
 } from "@/redux/features/leave/leaveApi";
 import { RequestLeaveData } from "@/types/leave.types";
+import { toast } from "sonner";
 
 const initialFormData: RequestLeaveData = {
   leaveType: "",
@@ -36,7 +37,7 @@ const RequestLeave = () => {
 
     try {
       await addLeave(formData).unwrap();
-      alert("Leave request submitted successfully!");
+      toast.success("Leave request submitted successfully!");
       router.push("/employee/dashboard");
     } catch (error) {
       console.error("Error submitting leave request:", error);
